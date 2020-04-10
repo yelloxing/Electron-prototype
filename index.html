@@ -7,14 +7,46 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Electron 原型项目</title>
     <link rel="stylesheet" href="./node_modules/@yelloxing/normalize.css/index.css">
+    <script>
+        window.nodeRequire = require;
+        delete window.require;
+        delete window.exports;
+        delete window.module;
+    </script>
     <script src="./node_modules/image2d/build/image2D.min.js"></script>
     <link rel="shortcut icon" href="./AC-angle.png">
 </head>
 
 <body>
 
+    <div>
+        <label>文件路径：</label>
+        <input type="text" id='url' value='README.md'>
+        <input type="button" value="查看" onclick='doSee(1)'>
+        <hr />
+        <div id="show">
+            温馨提示：输入路径后点击查看！
+        </div>
+    </div>
+
     <script>
-        alert('start up!');
+        console.log('start up!');
+
+        const {
+            ipcRenderer
+        } = nodeRequire('electron');
+
+        // 监听来自主进程的信息
+        ipcRenderer.on('readFileReply', (event, arg) => {
+            $$('#show')[0].innerText = arg;
+        });
+
+        function doSee() {
+
+            // 发送信息给主线程
+            ipcRenderer.send('readFile', $$('#url')[0].value);
+
+        }
     </script>
 
 </body>
